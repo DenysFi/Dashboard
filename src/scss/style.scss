@@ -1,0 +1,648 @@
+@use "sass:math";
+
+// Підключення міксинів ===========================================================================================================================================================================================================================================================================
+@import "base/mixins";
+
+// Підключення шрифтів ===========================================================================================================================================================================================================================================================================
+
+@import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600&display=swap");
+// Підключення іконкових шрифтів ==============================================================================================================================================================================================================================================================================
+@import "fonts/icons";
+@import "fonts/fonts";
+// ============================================================================================================================================================================================================================================================================================================================================================================================
+// За замовчуванням шрифт ============================================P==================================================================================================================================================================================================================================
+$fontFamily: "Poppins";
+$fontSize: toRem(14); // де 14(px) - розмір шрифту за замовчуванням з макету
+
+// Основні кольори
+$mainColor: #292d32; // Колір шрифту за замовчуванням
+$darkColor: #000;
+
+$blueColor: #5932ea;
+$grayBlueColor: #9197b3;
+
+$darkGreenColor: #008767;
+$lightGreenColor: #16c098;
+
+$grayColor: #b5b7c0;
+$darkGreyColor: #757575;
+
+$redColor: #df0404;
+$lightRedColor: #ffc5c5;
+
+// Палітра кольорів
+// @import "base/colors-palette";
+
+// Налаштування адаптивної сітки ===============================================================================================================================================================================================================================================================================================
+
+// Мінімальна ширина сторінки
+$minWidth: 320;
+// Ширина полотна (макету)
+$maxWidth: 1200;
+// Ширина обмежуючого контейнера (0 = немає обмеження)
+$maxWidthContainer: 0;
+// Загальний відступ у контейнера
+// (30 = по 15px ліворуч і праворуч, 0 = немає відступу)
+$containerPadding: 30;
+
+// Ширина спрацьовування першого брейкпоінту
+$containerWidth: $maxWidthContainer + $containerPadding;
+
+// Брейк-поїнти
+$pc: em(
+	$containerWidth
+); // ПК, ноутбуки, деякі планшети у горизонтальному положенні
+$tablet: em(991.98); // Планшети, деякі телефони в горизонтальному положенні
+$mobile: em(767.98); // Телефони L
+$mobileSmall: em(479.98); // Телефони S
+
+// Тип адаптива:
+// 1 = чуйність (у контейнера немає брейкпоінтів),
+// 2 = по брейк-поїнт (контейнер змінює свою ширину по брейк-поїнт)
+$responsiveType: 1;
+
+// ============================================================================================================================================================================================================================================================================================================================================================================================
+
+// Обнулення ============================================================================================================================================================================================== =============================================================================================== ===============================================================================================
+@import "base/null";
+
+// Стилі тега BODY ============================================================================================================================================================================================================================================================================================================================================================================================
+body {
+	display: none;
+	// Скролл заблоковано
+	.lock & {
+		overflow: hidden;
+		touch-action: none;
+		overscroll-behavior: none;
+	}
+	// Сайт завантажений
+	.loaded & {
+		display: block;
+	}
+}
+// Оболонка wrapper ============================================================================================================================================================================================================================================================================================================================================================================================================================================
+.wrapper {
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background-color: #f8fafe;
+	@supports (overflow: clip) {
+		overflow: clip;
+	}
+	// Притискаємо footer
+	> main {
+		flex: 1 1 auto;
+	}
+	// Фікс для слайдерів
+	> * {
+		min-width: 0;
+	}
+}
+// Обмежуючий контейнер ======================================================================================================================================================================================================================
+/*
+(i) Стилі будуть застосовуватись до
+всіх класів, що містять *__container
+Наприклад header__container, main__container і т.п.
+*/
+@if ($responsiveType==1) {
+	// Чуйна
+	[class*="__container"] {
+		@if ($maxWidthContainer>0) {
+			max-width: toRem($containerWidth);
+			margin: 0 auto;
+		}
+		@if ($containerPadding>0) {
+			@if ($maxWidthContainer>0) {
+				padding: 0 toRem(math.div($containerPadding, 2));
+			} @else {
+				@include adaptiveValue(
+					"padding-left",
+					math.div($containerPadding, 2),
+					15
+				);
+				@include adaptiveValue(
+					"padding-right",
+					math.div($containerPadding, 2),
+					15
+				);
+			}
+		}
+	}
+} @else {
+	// Брейк-поїнтами
+	[class*="__container"] {
+		margin: 0 auto;
+		@if ($maxWidthContainer>0) {
+			max-width: toRem($containerWidth);
+		} @else {
+			@if ($containerPadding>0) {
+				padding: 0 toRem(math.div($containerPadding, 2));
+			}
+		}
+		@media (max-width: $pc) {
+			max-width: toRem(970);
+		}
+		@media (max-width: $tablet) {
+			max-width: toRem(750);
+		}
+		@media (max-width: $mobile) {
+			max-width: none;
+			@if ($containerPadding>0 and $maxWidthContainer>0) {
+				padding: 0 toRem(math.div($containerPadding, 2));
+			}
+		}
+	}
+}
+
+// Підключення базових стилів, шаблонів (заготівель) та допоміжних класів
+@import "base";
+
+// Підключення стилів загальних елементів проекту
+@import "common";
+
+// Підключення стилів окремих блоків
+@import "header";
+@import "footer";
+
+.dashboard {
+	// .dashboard__container
+	&__container {
+		display: flex;
+	}
+	// .dashboard__sidebar
+	&__sidebar {
+		position: fixed;
+		@include adaptiveValue("width", 306, 240, 0, 1472, 991);
+
+		@media (max-width: $tablet) {
+			width: toRem(85);
+		}
+	}
+	// .dashboard__content
+	&__content {
+	}
+}
+.sidebar {
+	display: flex;
+	flex-direction: column;
+
+	@include adaptiveValue("padding-top", 39, 25);
+	@include adaptiveValue("padding-bottom", 39, 25);
+
+	@media (max-width: $tablet) {
+		padding-right: toRem(15);
+	}
+
+	padding-right: toRem(25);
+	padding-left: calc(toRem($containerPadding) / 2);
+	flex-basis: toRem(306);
+	flex-shrink: 1;
+	margin-left: calc(toRem(-$containerPadding) / 2);
+	height: 100vh;
+	background-color: #ffffff;
+	box-shadow: 0px toRem(10) toRem(60) 0px rgba(226, 236, 249, 0.5);
+
+	// .sidebar__logo
+	&__logo {
+		margin-bottom: toRem(38);
+		display: flex;
+		align-items: center;
+
+		div {
+			display: flex;
+			align-items: flex-end;
+
+			@media (max-width: $tablet) {
+				display: none;
+			}
+
+			p {
+				margin-left: toRem(8);
+				margin-right: toRem(4);
+				font-weight: 600;
+				color: $darkColor;
+				@include adaptiveValue("font-size", 26, 20);
+				letter-spacing: toRem(0.26);
+			}
+			span {
+				color: #838383;
+				font-size: toRem(10);
+				font-weight: 500;
+				letter-spacing: toRem(-0.1);
+				text-align: end;
+				line-height: 150%;
+			}
+		}
+	}
+	// .sidebar__nav
+	&__nav {
+		flex: 1 1 auto;
+	}
+	// .sidebar__items
+	&__items {
+		display: grid;
+
+		@include adaptiveValue("gap", 29, 10);
+	}
+	// .sidebar__item
+	&__item {
+	}
+	// .sidebar__item-icon
+	&__item-icon {
+		font-size: toRem(21);
+
+		@media (min-width: $tablet) {
+			margin-right: toRem(14);
+		}
+	}
+	// .sidebar__item-link
+	&__item-link {
+		display: flex;
+		color: $grayBlueColor;
+
+		@media (max-width: $tablet) {
+			padding: toRem(8);
+		}
+
+		padding: toRem(11) toRem(11) toRem(11) toRem(8);
+		font-weight: 500;
+		letter-spacing: toRem(-0.14);
+		align-items: center;
+		border-radius: toRem(8);
+		cursor: pointer;
+		width: 100%;
+
+		transition: all 0.3s;
+		@media (any-hover: hover) {
+			&:hover {
+				color: #fff;
+				background: $blueColor;
+			}
+		}
+
+		&.active {
+			color: #fff;
+			background: $blueColor;
+		}
+
+		&::after {
+			@extend %ic;
+			font-size: toRem(16);
+			transform: rotate(180deg);
+
+			@media (min-width: $tablet) {
+				margin-left: auto;
+			}
+
+			content: "\e900";
+		}
+
+		@media (max-width: $tablet) {
+			span {
+				display: none;
+			}
+		}
+	}
+
+	&__footer {
+	}
+}
+.footer-sidebar {
+	display: flex;
+	column-gap: toRem(12);
+	align-items: center;
+
+	@media (min-width: $tablet) {
+		margin-bottom: toRem(37);
+	}
+
+	@media (max-width: $tablet) {
+		justify-content: center;
+	}
+
+	// .footer-sidebar__avatar
+	&__avatar {
+		overflow: hidden;
+		width: toRem(42);
+		height: toRem(42);
+		border-radius: 50%;
+		object-position: center;
+
+		img {
+			width: 100%;
+			height: 100%;
+		}
+	}
+
+	// .footer-sidebar__body
+	&__body {
+		@media (max-width: $tablet) {
+			display: none;
+		}
+	}
+
+	// .footer-sidebar__name
+	&__name {
+		font-weight: 500;
+		line-height: normal;
+		letter-spacing: toRem(0.14);
+		color: $darkColor;
+	}
+
+	// .footer-sidebar__label
+	&__label {
+		font-size: toRem(12);
+		letter-spacing: toRem(0.12);
+		color: $darkGreyColor;
+	}
+}
+
+.content-dashboard {
+	@include adaptiveValue("margin-left", 291, 225, 0, 1472, 991);
+	@include adaptiveValue("padding-left", 71, 10, 0, 1472, 991);
+	@include adaptiveValue("padding-right", 71, 10, 1, 1472, 991);
+
+	@media (max-width: $tablet) {
+		margin-left: toRem(70);
+	}
+
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+
+	@include adaptiveValue("padding-top", 41, 25);
+	@include adaptiveValue("padding-bottom", 41, 25);
+
+	// .content-dashboard__greetings
+	&__greetings {
+		color: $darkColor;
+		font-size: toRem(24);
+		font-weight: 500;
+		@include adaptiveValue("margin-bottom", 51, 20);
+	}
+	// .content-dashboard__main
+	&__main {
+		background-color: #fff;
+		box-shadow: 0px toRem(10) toRem(60) 0px rgba(226, 236, 249, 0.5);
+		border-radius: toRem(30);
+		@include adaptiveValue("padding", 38, 15, 0, 1472, 991);
+	}
+	// .content-dashboard__header
+	&__header {
+		display: flex;
+		column-gap: toRem(10);
+		row-gap: toRem(20);
+		justify-content: space-between;
+		align-items: center;
+
+		@media (max-width: $mobile) {
+			flex-direction: column;
+			align-items: self-start;
+		}
+	}
+	// .content-dashboard__title
+	&__title {
+		color: $darkColor;
+		font-size: toRem(22);
+		font-weight: 600;
+		line-height: 137.5%; /* 22/16 */
+		letter-spacing: toRem(-0.22);
+		margin-bottom: toRem(8);
+	}
+	// .content-dashboard__subtitle
+	&__subtitle {
+		color: $lightGreenColor;
+		letter-spacing: toRem(-0.14);
+	}
+
+	// .content-dashboard__input-body
+	&__input-body {
+		display: flex;
+		border-radius: toRem(10);
+		background-color: #f9fbff;
+		padding: toRem(7) toRem(8);
+
+		@media (min-width: $mobile) {
+			max-width: toRem(216);
+			min-width: toRem(125);
+		}
+
+		width: 100%;
+
+		border-width: toRem(1);
+		border-style: solid;
+		border-color: transparent;
+
+		&:focus-within {
+			border-color: $blueColor;
+		}
+		button {
+			font-size: toRem(24);
+			color: $darkGreyColor;
+		}
+	}
+
+	// .content-dashboard__input
+	&__input {
+		font-size: toRem(12);
+		width: 100%;
+		letter-spacing: toRem(-0.12);
+		margin-left: toRem(8);
+		color: $grayColor;
+		outline: none;
+		background-color: transparent;
+	}
+
+	&__table {
+	}
+
+	&__footer {
+	}
+}
+
+.footer-dashboard {
+	display: flex;
+	align-items: center;
+
+	@media (min-width: $mobile) {
+		justify-content: space-between;
+	}
+
+	@media (max-width: $mobile) {
+		row-gap: toRem(20);
+		flex-direction: column;
+	}
+
+	@include adaptiveValue("padding-top", 30, 20);
+
+	// .footer-dashboard__label
+	&__label {
+		letter-spacing: toRem(-0.14);
+		color: $grayColor;
+		font-weight: 500;
+		word-break: break-all;
+	}
+	// .footer-dashboard__bullets
+	&__bullets {
+		display: flex;
+		gap: toRem(12);
+	}
+	// .footer-dashboard__bullet
+	&__bullet {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: toRem(4);
+		background-color: #f5f5f5;
+		border: toRem(1) solid #eee;
+
+		@include adaptiveValue("width", 25, 20);
+		@include adaptiveValue("height", 25, 20);
+
+		transition:
+			background-color 0.3s,
+			color 0.3s;
+
+		@media (max-width: $mobileSmall) {
+			&:nth-child(odd) {
+				display: none;
+			}
+			&:first-child {
+				display: flex;
+			}
+		}
+
+		&.active {
+			background-color: $blueColor;
+			color: #fff;
+			border-color: $blueColor;
+		}
+
+		@media (any-hover: hover) {
+			&:hover {
+				background-color: $blueColor;
+				color: #fff;
+				border-color: $blueColor;
+			}
+		}
+
+		&.more {
+			background-color: transparent;
+			border-color: transparent;
+
+			@media (any-hover: hover) {
+				&:hover {
+					background-color: $blueColor;
+					color: #fff;
+					border-color: $blueColor;
+				}
+			}
+		}
+		color: #404b52;
+
+		&:first-child {
+			font-size: toRem(12);
+		}
+		&:last-child {
+			rotate: 180deg;
+		}
+	}
+}
+
+.table {
+	border-collapse: collapse;
+	@include adaptiveValue("margin-top", 40, 20);
+	width: 100%;
+
+	// .table__head
+	&__head {
+		@media (max-width: $mobile) {
+			display: none;
+		}
+	}
+	// .table__row
+	&__row {
+		border-bottom: toRem(1) solid #eee;
+
+		@media (max-width: $mobile) {
+			display: flex;
+			flex-direction: column;
+		}
+	}
+	// .table__header-cell
+	&__header-cell {
+		color: #b5b7c0;
+		align-self: center;
+		font-weight: 500;
+		letter-spacing: toRem(-0.14);
+		padding-bottom: toRem(14);
+		text-align: start;
+
+		&:not(:last-child) {
+			padding-right: toRem(10);
+		}
+
+		&:last-child {
+			text-align: center;
+		}
+	}
+
+	// .table__body
+	&__body {
+	}
+
+	// .table__cell
+	&__cell {
+		@include adaptiveValue("padding-top", 24, 14);
+		@include adaptiveValue("padding-bottom", 24, 14);
+
+		font-weight: 500;
+		letter-spacing: toRem(-0.14);
+		letter-spacing: toRem(-0.14);
+
+		&::before {
+			@media (min-width: $mobile) {
+				display: none;
+			}
+
+			color: #b5b7c0;
+			font-weight: 500;
+			content: attr(data-cell);
+			display: block;
+			padding-bottom: toRem(14);
+		}
+
+		&:not(:last-child) {
+			word-break: break-all;
+			padding-right: toRem(10);
+		}
+	}
+	// .table__status
+	&__status {
+		margin: 0 auto;
+
+		@media (min-width: $mobile) {
+			max-width: toRem(80);
+		}
+
+		width: 100%;
+		padding: toRem(4) toRem(12);
+		border: toRem(1) solid;
+		text-align: center;
+
+		&.active {
+			color: $darkGreenColor;
+			background-color: rgba(22, 192, 152, 0.38);
+			border-color: $darkGreenColor;
+		}
+
+		&.inactive {
+			color: $redColor;
+			background-color: $lightRedColor;
+			border-color: $redColor;
+		}
+
+		border-radius: toRem(4);
+	}
+}
